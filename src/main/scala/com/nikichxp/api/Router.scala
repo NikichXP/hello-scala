@@ -23,6 +23,7 @@ class Router(userRegistry: ActorRef[UserRegistry.Command])(implicit val system: 
 
   private val pdfSigner = new PdfSigner()
   private val fileRouter = new FileRouter()
+  private val dbFooRouter = new DBFooRouter()
 
   def getUsers: Future[Users] =
     userRegistry.ask(GetUsers)
@@ -41,6 +42,9 @@ class Router(userRegistry: ActorRef[UserRegistry.Command])(implicit val system: 
   val userRoutes: Route =
     pathPrefix("api") {
       concat(
+        path("db") {
+          dbFooRouter.getRoutes()
+        },
         path("sign") {
           fileRouter.getRoutes()
         },

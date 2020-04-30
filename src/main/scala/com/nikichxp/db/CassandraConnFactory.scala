@@ -8,9 +8,16 @@ object CassandraConnFactory {
 
   val connection: CqlSession = createConnection()
 
-  private def createConnection() = CqlSession.builder()
+  private def createConnection() : CqlSession = {
+    val conn = createConnectionInt()
+    println(conn)
+    conn
+  }
+
+  private def createConnectionInt() = CqlSession.builder()
     .addContactPoint(new InetSocketAddress("127.0.0.1", 9042))
-    .withLocalDatacenter("dc1")
-    .build();
+    .withKeyspace("test")
+    .withLocalDatacenter("datacenter1")
+    .build()
 
 }

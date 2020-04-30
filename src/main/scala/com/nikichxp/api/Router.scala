@@ -22,7 +22,7 @@ class Router(userRegistry: ActorRef[UserRegistry.Command])(implicit val system: 
   implicit val ec = ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
 
   private val pdfSigner = new PdfSigner()
-  private val fileRouter = new FileRouter()
+  private val signatureApi = new SignatureApi()
   private val dbFooRouter = new DBFooRouter()
 
   def getUsers: Future[Users] =
@@ -45,9 +45,7 @@ class Router(userRegistry: ActorRef[UserRegistry.Command])(implicit val system: 
         path("db") {
           dbFooRouter.getRoutes()
         },
-        path("sign") {
-          fileRouter.getRoutes()
-        },
+        signatureApi.getRoutes,
         path("users") {
           concat(
             pathEnd {

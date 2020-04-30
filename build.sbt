@@ -35,3 +35,6 @@ libraryDependencies ++= Seq(
   "com.datastax.oss" % "java-driver-query-builder",
   "com.datastax.oss" % "java-driver-mapper-runtime",
 ).map(_ % cassandraDriverVersion)
+
+libraryDependencies += "org.apache.pdfbox" % "pdfbox" % "2.0.19"
+

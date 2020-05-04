@@ -36,7 +36,7 @@ object QuickstartApp {
       context.watch(userRegistryActor)
 
       val routes = new Router(userRegistryActor)(context.system)
-      startHttpServer(routes.userRoutes, context.system)
+      startHttpServer(routes.routes, context.system)
 
       Behaviors.empty
     }

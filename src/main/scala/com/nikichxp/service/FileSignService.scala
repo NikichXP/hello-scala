@@ -13,11 +13,6 @@ import org.apache.pdfbox.pdmodel.PDDocument
 
 class FileSignService {
 
-  {
-    signFileAlt()
-    signFile(new File(""), "")
-  }
-
   def signFileAlt() = {
     val document = PDDocument.load(new File("D:/keys/card.pdf"))
     val signature = new PDSignature()

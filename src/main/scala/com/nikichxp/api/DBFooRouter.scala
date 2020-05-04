@@ -15,7 +15,7 @@ class DBFooRouter(implicit override val system: ActorSystem[_]) extends RouterPa
   private val connection = CassandraConnFactory.connection
   private val fileSignService = new FileSignService()
 
-  def getRoutes(): Route = post {
+  def getRoutes: Route = post {
     entity(as[String]) { person =>
       person
       complete(connection.getName)

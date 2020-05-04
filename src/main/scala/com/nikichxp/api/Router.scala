@@ -11,7 +11,7 @@ import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.nikichxp.JsonFormats._
 import com.nikichxp.UserRegistry._
-import com.nikichxp.pdf.PdfSigner
+import com.nikichxp.pdf.{MyRenderer, PdfSigner}
 import com.nikichxp.{JsonFormats, User, UserRegistry, Users}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -21,9 +21,10 @@ class Router(userRegistry: ActorRef[UserRegistry.Command])(implicit val system: 
   private implicit val timeout = Timeout.create(system.settings.config.getDuration("my-app.routes.ask-timeout"))
   implicit val ec = ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
 
-  private val pdfSigner = new PdfSigner()
-  private val signatureApi = new SignatureApi()
-  private val dbFooRouter = new DBFooRouter()
+  private val pdfSigner = new PdfSigner
+  private val signatureApi = new SignatureApi
+  private val dbFooRouter = new DBFooRouter
+  private val myRenderer = new MyRenderer
 
   def getUsers: Future[Users] =
     userRegistry.ask(GetUsers)
@@ -39,43 +40,53 @@ class Router(userRegistry: ActorRef[UserRegistry.Command])(implicit val system: 
 
   def test() = "Hello!"
 
-  val userRoutes: Route =
-    pathPrefix("api") {
-      concat(
-        path("db") {
-          dbFooRouter.getRoutes()
-        },
-        signatureApi.getRoutes,
-        path("users") {
-          concat(
-            pathEnd {
-              concat(
-                get {
-                  complete(getUsers)
-                },
-                post {
-                  entity(as[User]) { user =>
-                    onSuccess(createUser(user)) { performed =>
-                      complete((StatusCodes.Created, performed))
-                    }
+  val routes: Route =
+    concat(
+      pathPrefix("sign") {
+        signatureApi.getRoutes
+      },
+      pathPrefix("templates") {
+        signatureApi.getRoutes
+      },
+      pathPrefix("key") {
+        signatureApi.getRoutes
+      },
+
+
+      // test below
+      pathPrefix("db") {
+        dbFooRouter.getRoutes
+      },
+      pathPrefix("users") {
+        concat(
+          pathEnd {
+            concat(
+              get {
+                complete(getUsers)
+              },
+              post {
+                entity(as[User]) { user =>
+                  onSuccess(createUser(user)) { performed =>
+                    complete((StatusCodes.Created, performed))
                   }
-                })
-            },
-            path(Segment) { name =>
-              concat(
-                get {
-                  rejectEmptyResponse {
-                    onSuccess(getUser(name)) { response =>
-                      complete(response.maybeUser)
-                    }
+                }
+              })
+          },
+          path(Segment) { name =>
+            concat(
+              get {
+                rejectEmptyResponse {
+                  onSuccess(getUser(name)) { response =>
+                    complete(response.maybeUser)
                   }
-                },
-                delete {
-                  onSuccess(deleteUser(name)) { performed =>
-                    complete((StatusCodes.OK, performed))
-                  }
-                })
-            })
-        })
-    }
+                }
+              },
+              delete {
+                onSuccess(deleteUser(name)) { performed =>
+                  complete((StatusCodes.OK, performed))
+                }
+              })
+          })
+      }
+    )
 }

@@ -25,30 +25,32 @@ class SignatureApi(implicit override val system: ActorSystem[_]) extends RouterP
    * POST /
    */
 
-  def getRoutes: Route = path("sign") {
+  def getRoutes: Route =
     concat(
-      pathEnd {
-        uploadFile()
-      },
       path("key") {
         concat(
-          pathEnd {
-            concat(
-              get {
-                complete("TODO list keys")
-              },
-              post {
-                complete("Upload key")
-              }
-            )
-          },
+          concat(
+            get {
+              complete("TODO list keys")
+            },
+            post {
+              complete("Upload key")
+            }
+          ),
           path(Segment) { id =>
             complete(f"Get key with id $id")
           }
         )
+      },
+      path("/file") {
+        pathEnd {
+          get {
+            complete("TODO upload file")
+          }
+        }
       }
     )
-  }
+
 
   def uploadFile(): Route = post {
     entity(as[Multipart.FormData]) { formData =>

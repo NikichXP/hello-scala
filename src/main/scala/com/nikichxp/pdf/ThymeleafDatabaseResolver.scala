@@ -6,7 +6,7 @@ import org.thymeleaf.templateresolver.StringTemplateResolver
 import org.thymeleaf.templateresource.ITemplateResource
 import java.util
 
-class ThymeleafDatabaseResolver() extends StringTemplateResolver {
+class ThymeleafDatabaseResolver(private val provider: TemplateProvider) extends StringTemplateResolver {
 
   setResolvablePatterns(Sets.newHashSet("db:*"))
 

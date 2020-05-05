@@ -11,7 +11,8 @@ import akka.http.scaladsl.server.Route
 import akka.util.Timeout
 import com.nikichxp.JsonFormats._
 import com.nikichxp.UserRegistry._
-import com.nikichxp.pdf.{MyRenderer, PdfSigner}
+import com.nikichxp.db.CassandraConnFactory
+import com.nikichxp.pdf.{DBTemplateProvider, MyRenderer, PdfSigner}
 import com.nikichxp.{JsonFormats, User, UserRegistry, Users}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,6 +26,8 @@ class Router(userRegistry: ActorRef[UserRegistry.Command])(implicit val system: 
   private val signatureApi = new SignatureApi
   private val dbFooRouter = new DBFooRouter
   private val myRenderer = new MyRenderer
+
+  private val templateProvider = new DBTemplateProvider(CassandraConnFactory.connection)
 
   def getUsers: Future[Users] =
     userRegistry.ask(GetUsers)

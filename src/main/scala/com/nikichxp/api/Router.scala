@@ -12,7 +12,7 @@ import akka.util.Timeout
 import com.nikichxp.JsonFormats._
 import com.nikichxp.UserRegistry._
 import com.nikichxp.db.CassandraConnFactory
-import com.nikichxp.pdf.{DBTemplateProvider, MyRenderer, PdfSigner}
+import com.nikichxp.pdf.{DBTemplateProvider, MyRenderer, PDFTest}
 import com.nikichxp.{JsonFormats, User, UserRegistry, Users}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -22,10 +22,10 @@ class Router(userRegistry: ActorRef[UserRegistry.Command])(implicit val system: 
   private implicit val timeout = Timeout.create(system.settings.config.getDuration("my-app.routes.ask-timeout"))
   implicit val ec = ExecutionContext.fromExecutorService(Executors.newCachedThreadPool())
 
-  private val pdfSigner = new PdfSigner
   private val signatureApi = new SignatureApi
   private val dbFooRouter = new DBFooRouter
   private val myRenderer = new MyRenderer
+  private val testBean = PDFTest
 
   private val templateProvider = new DBTemplateProvider(CassandraConnFactory.connection)
 

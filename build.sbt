@@ -39,3 +39,8 @@ libraryDependencies ++= Seq(
 libraryDependencies += "org.apache.pdfbox" % "pdfbox" % "2.0.19"
 libraryDependencies += "org.xhtmlrenderer" % "flying-saucer-pdf" % "9.1.20"
 libraryDependencies += "org.thymeleaf" % "thymeleaf" % "3.0.6.RELEASE"
+
+//libraryDependencies ++= Seq(
+//  "org.bouncycastle" % "bcprov-jdk15on",
+//  "org.bouncycastle" % "bcpkix-jdk15on"
+//).map(_ % "1.65")

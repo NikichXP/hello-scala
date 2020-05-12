@@ -1,6 +1,6 @@
 package com.nikichxp.pdf
 
-import java.io.{BufferedWriter, File, FileOutputStream, OutputStreamWriter}
+import java.io.{File, FileOutputStream}
 import java.util.UUID
 
 import com.nikichxp.db.CassandraConnFactory
@@ -11,33 +11,34 @@ import org.xhtmlrenderer.pdf.ITextRenderer
 
 class MyRenderer {
 
-  private val testText = "<html lang=\"ru\">\n<body>\n<h1>Hello: generated template msg is [[${test}]]!</h1>\n</body>\n</html>"
-
-  val id = UUID.randomUUID().toString
-  val testStream = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f"src/main/resources/templates/$id.pdf")))
-  testStream.write(testText)
-  testStream.close()
-
-  val templateResolver = new ClassLoaderTemplateResolver
+  private val templateResolver = new ClassLoaderTemplateResolver
   templateResolver.setSuffix(".html")
   templateResolver.setTemplateMode("HTML")
 
-
-  val templateEngine = new TemplateEngine
+  private val templateEngine = new TemplateEngine
   templateEngine.addTemplateResolver(new ThymeleafDatabaseResolver(new DBTemplateProvider(CassandraConnFactory.connection)))
-  //    templateEngine.setTemplateResolver(templateResolver)
+  templateEngine.addTemplateResolver(templateResolver)
 
-  val context = new Context()
-  context.setVariable("test", "hello world")
+  /**
+   * @param key test is "db:test"
+   */
+  def render(key: String, params: Map[String, String]): File = {
+    val context = new Context
+    for ((k, v) <- params) context.setVariable(k, v)
+    val html = templateEngine.process(key, context)
+    renderInternal(html)
+  }
 
-  // Get the plain HTML with the resolved ${name} variable!
-  val html = templateEngine.process(f"db:$id", context)
+  private def renderInternal(html: String): File = {
+    val id = UUID.randomUUID().toString
+    val file = new File(f"temp/$id.pdf")
+    val outputStream = new FileOutputStream(file)
+    val renderer = new ITextRenderer
+    renderer.setDocumentFromString(html)
+    renderer.layout()
+    renderer.createPDF(outputStream)
 
-  val outputStream = new FileOutputStream(f"temp/$id.pdf")
-  val renderer = new ITextRenderer
-  renderer.setDocumentFromString(html)
-  renderer.layout()
-  renderer.createPDF(outputStream)
-
+    file
+  }
 
 }

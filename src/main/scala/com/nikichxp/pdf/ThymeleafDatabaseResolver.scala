@@ -1,10 +1,11 @@
 package com.nikichxp.pdf
 
+import java.util
+
 import com.datastax.oss.driver.shaded.guava.common.collect.Sets
 import org.thymeleaf.IEngineConfiguration
 import org.thymeleaf.templateresolver.StringTemplateResolver
 import org.thymeleaf.templateresource.ITemplateResource
-import java.util
 
 class ThymeleafDatabaseResolver(private val provider: TemplateProvider) extends StringTemplateResolver {
 

@@ -13,7 +13,7 @@ import com.nikichxp.JsonFormats._
 import com.nikichxp.UserRegistry._
 import com.nikichxp.db.CassandraConnFactory
 import com.nikichxp.pdf.{DBTemplateProvider, MyRenderer, PDFTest}
-import com.nikichxp.{JsonFormats, User, UserRegistry, Users}
+import com.nikichxp.{User, UserRegistry, Users}
 
 import scala.concurrent.{ExecutionContext, Future}
 

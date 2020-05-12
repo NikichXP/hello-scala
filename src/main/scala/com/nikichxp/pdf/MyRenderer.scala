@@ -31,7 +31,7 @@ class MyRenderer {
 
   private def renderInternal(html: String): File = {
     val id = UUID.randomUUID().toString
-    val file = new File(f"temp/$id.pdf")
+    val file = new File(f"temp/${System.currentTimeMillis()}-${id.substring(0, 8)}.pdf")
     val outputStream = new FileOutputStream(file)
     val renderer = new ITextRenderer
     renderer.setDocumentFromString(html)

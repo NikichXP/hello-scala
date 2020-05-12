@@ -1,41 +1,19 @@
 package com.nikichxp.service;
 
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.cms.Attribute;
+import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.cms.Attributes;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.cms.CMSSignedData;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.tsp.TSPException;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Class responsible for deal with Time Stamps.
- * Time Stamp can be added when Time Stamp Authority URL is available.
- */
 class TimeStampManager {
-    private TSAClient tsaClient;
 
-    /**
-     * @param tsaUrl The url where request for Time Stamp will be done.
-     * @throws NoSuchAlgorithmException
-     * @throws MalformedURLException
-     */
-    TimeStampManager(String tsaUrl) throws NoSuchAlgorithmException, MalformedURLException {
-        if (tsaUrl != null) {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            this.tsaClient = new TSAClient(new URL(tsaUrl), null, null, digest);
-        }
-    }
 
     /**
      * Extend cms signed data with TimeStamp first or to all signers
@@ -73,10 +51,10 @@ class TimeStampManager {
             vector = unsignedAttributes.toASN1EncodableVector();
         }
 
-        byte[] token = this.tsaClient.getTimeStampToken(signer.getSignature());
-        ASN1ObjectIdentifier oid = PKCSObjectIdentifiers.id_aa_signatureTimeStampToken;
-        ASN1Encodable signatureTimeStamp = new Attribute(oid, new DERSet(ASN1Primitive.fromByteArray(token)));
-        vector.add(signatureTimeStamp);
+//        byte[] token = this.tsaClient.getTimeStampToken(signer.getSignature());
+//        ASN1ObjectIdentifier oid = PKCSObjectIdentifiers.id_aa_signatureTimeStampToken;
+//        ASN1Encodable signatureTimeStamp = new Attribute(oid, new DERSet(ASN1Primitive.fromByteArray(token)));
+//        vector.add(signatureTimeStamp);
         Attributes signedAttributes = new Attributes(vector);
 
         // replace unsignedAttributes with the signed once

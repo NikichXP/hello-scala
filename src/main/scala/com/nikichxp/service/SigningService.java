@@ -6,29 +6,24 @@ import org.apache.pdfbox.pdmodel.interactive.digitalsignature.SignatureInterface
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Calendar;
 
 public class SigningService {
 
-    private static final String KEY_STORE_TYPE = "jks";
     private final String keyStorePath;
     private final String keyStorePassword;
     private final String certificateAlias;
-    private final String tsaUrl;
 
     private BouncyCastleProvider provider = new BouncyCastleProvider();
 
-    public SigningService(String keyStorePath, String keyStorePassword, String certificateAlias, String tsaUrl) {
+    public SigningService(String keyStorePath, String keyStorePassword, String certificateAlias) {
         this.keyStorePath = keyStorePath;
         this.keyStorePassword = keyStorePassword;
         this.certificateAlias = certificateAlias;
-        this.tsaUrl = tsaUrl;
     }
 
     public boolean signPdf(File file) {
@@ -37,7 +32,7 @@ public class SigningService {
                 throw new IllegalArgumentException("File is empty, directory or larger than 2GB");
             }
             KeyStore keyStore = this.getKeyStore();
-            Signature signature = new Signature(keyStore, this.keyStorePassword.toCharArray(), certificateAlias, tsaUrl);
+            Signature signature = new Signature(keyStore, this.keyStorePassword.toCharArray(), certificateAlias);
             this.signDetached(signature, file);
             return true;
         } catch (Exception e) {
@@ -55,7 +50,7 @@ public class SigningService {
     }
 
     private void signDetached(SignatureInterface signature, File file) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(file); PDDocument doc = PDDocument.load(file)) {
+        try (PDDocument doc = PDDocument.load(file); FileOutputStream fos = new FileOutputStream(file)) {
             signDetached(signature, doc, fos);
         }
     }

@@ -1,6 +1,6 @@
 package com.nikichxp.test
 
-import spray.json.DefaultJsonProtocol._ //put `jsonFormat2` in scope
+import spray.json.DefaultJsonProtocol._
 import spray.json.RootJsonFormat
 
 case class ScalaEntity(var id: Int, text: String) {

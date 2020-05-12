@@ -4,16 +4,14 @@ import java.util.UUID
 
 import akka.actor.typed.ActorSystem
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.server.Directives.{as, complete, entity, onSuccess, post}
+import akka.http.scaladsl.server.Directives.{as, complete, entity, post}
 import akka.http.scaladsl.server.Route
 import com.nikichxp.db.CassandraConnFactory
-import com.nikichxp.service.FileSignService
 import spray.json.DefaultJsonProtocol
 
 class DBFooRouter(implicit override val system: ActorSystem[_]) extends RouterParent {
 
   private val connection = CassandraConnFactory.connection
-  private val fileSignService = new FileSignService()
 
   def getRoutes: Route = post {
     entity(as[String]) { person =>

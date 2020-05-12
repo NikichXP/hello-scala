@@ -9,14 +9,12 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.stream.scaladsl.FileIO
 import com.nikichxp.db.CassandraConnFactory
-import com.nikichxp.service.FileSignService
 
 import scala.concurrent.Future
 
 class SignatureApi(implicit override val system: ActorSystem[_]) extends RouterParent {
 
   private val connection = CassandraConnFactory.connection
-  private val fileSignService = new FileSignService()
 
   /** /sign API. methods:
    * POST /key

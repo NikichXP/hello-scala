@@ -9,7 +9,8 @@ object PDFTest {
 
   val keystoreProvider = new KeystoreProvider
 
-  keystoreProvider.insertKey(new File("D:/keys/keystore.p12"), "changeit")
+  keystoreProvider.insertKey(new File("D:/keys/keystore.p12"), "nikichxp", "changeit")
+  keystoreProvider.getByAlias("nikichxp")
 
   val provider = new DBTemplateProvider(CassandraConnFactory.connection)
   val renderer = new MyRenderer

@@ -1,49 +1,43 @@
 package com.nikichxp.service
 
 import java.io.{File, FileInputStream}
-import java.util.UUID
 
 import com.mongodb.client.MongoClients
-import com.nikichxp.util.DocUtils
+import com.nikichxp.model.SigningKey
 import org.bson.Document
-//import org.mongodb.scala.{Completed, Observer}
+import io.circe._, io.circe.generic.auto._, io.circe.parser._, io.circe.syntax._
 
 class KeystoreProvider {
 
   private val mongo = MongoClients.create("mongodb://localhost:27017").getDatabase("otp")
+  private val keyCollection = mongo.getCollection("key")
 
   /**
    * TODO Store passwords in some external storage
    */
-  def insertKey(file: File, password: String): Unit = {
+  def insertKey(file: File, alias: String, password: String): Unit = {
     val data = new Array[Byte](file.length().toInt)
     new FileInputStream(file).read(data)
+    val key = SigningKey(data, alias, password)
 
-    val obj = Map("data" -> data, "password" -> password)
-    val document = new Document()
+    val json = key.asJson.noSpaces
+    val document = Document.parse(json)
 
-    for ((key, value) <- obj) document.append(key, value)
+    keyCollection.insertOne(document)
+  }
 
-    DocUtils.toDocument(Key(data, password))
-
-    mongo.getCollection("key")
-      .insertOne(document)
-    //      .insertOne(Key(_id = UUID.randomUUID().toString, data, password))
-    //      .subscribe(new Observer[Completed] {
-    //        override def onNext(result: Completed): Unit = {
-    //
-    //        }
-    //
-    //        override def onError(e: Throwable): Unit = {
-    //
-    //        }
-    //
-    //        override def onComplete(): Unit = {
-    //
-    //        }
-    //      })
+  def getByAlias(alias: String): SigningKey = {
+    val search = keyCollection.find(new Document().append("alias", alias))
+    val document = search.cursor().tryNext()
+    if (document == null) {
+      return null
+    }
+    decode[SigningKey](document.toJson()) match {
+      case Right(key) => key
+      case Left(err) =>
+        err.fillInStackTrace().printStackTrace()
+        null
+    }
   }
 
 }
-
-case class Key(var data: Array[Byte], var pass: String)
